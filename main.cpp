@@ -14,6 +14,7 @@ string CLASSES[] = {"background", "aeroplane", "bicycle", "bird", "boat",
                     "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
                     "sofa", "train", "tvmonitor"};
 
+string FILTERED_CLASSES[] = {"person", "car", "motorbike"};
 //int detectAndDraw(const HOGDescriptor &hog, Mat &img)
 //{
 //    vector<Rect> found, found_filtered;
@@ -47,6 +48,15 @@ string CLASSES[] = {"background", "aeroplane", "bicycle", "bird", "boat",
 //    return found_filtered.size();
 //}
 
+string CurrentDate()
+{
+    std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+
+    char buf[100] = {0};
+    std::strftime(buf, sizeof(buf), "%Y-%m-%d", std::localtime(&now));
+    return buf;
+}
+
 int dnnDetectAndDraw( Net &net, Mat &frame ) {
     Mat frame2;
     resize(frame, frame2, Size(300,300));
@@ -56,14 +66,25 @@ int dnnDetectAndDraw( Net &net, Mat &frame ) {
     Mat detection = net.forward("detection_out");
     Mat detectionMat(detection.size[2], detection.size[3], CV_32F, detection.ptr<float>());
     ostringstream ss;
-    float confidenceThreshold = 0.5;
+    float confidenceThreshold = 0.20;
     for (int i = 0; i < detectionMat.rows; i++)
     {
         float confidence = detectionMat.at<float>(i, 2);
 
-        if (confidence > confidenceThreshold)
+        if (confidence > confidenceThreshold )
         {
             int idx = static_cast<int>(detectionMat.at<float>(i, 1));
+            bool found = false;
+            for(auto i: FILTERED_CLASSES)
+            {
+                if (i == CLASSES[idx]){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found or idx > size(CLASSES)) {
+                break;
+            }
             int xLeftBottom = static_cast<int>(detectionMat.at<float>(i, 3) * frame.cols);
             int yLeftBottom = static_cast<int>(detectionMat.at<float>(i, 4) * frame.rows);
             int xRightTop = static_cast<int>(detectionMat.at<float>(i, 5) * frame.cols);
@@ -85,6 +106,7 @@ int dnnDetectAndDraw( Net &net, Mat &frame ) {
             Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
             putText(frame, label, Point(xLeftBottom, yLeftBottom),
                     FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0,0,0));
+            imwrite(string("image_")+CurrentDate()+"_"+CLASSES[idx]+".jpg", frame);
         }
     }
     return 0;
@@ -95,7 +117,8 @@ int main(int argc, char **argv)
     cout << getBuildInformation();
     cout << "Built with OpenCV " << CV_VERSION << endl;
     string window_name = "RGB Camera";
-    const string rtsp_url = "rtsp://admin:03011995@192.168.1.2:5543/live/channel0";
+//    const string rtsp_url = "rtsp://admin:03011995@192.168.1.2:5543/live/channel0";
+    const string rtsp_url = "https://pub.hk-opt.com/LiveApp/streams/687489889091511277827377.m3u8"; //https://bpjt.pu.go.id/cctv/cctv_inframe
 //    HOGDescriptor hog;
 //    hog.setSVMDetector(HOGDescriptor::getDefaultPeopleDetector());
 
@@ -113,8 +136,8 @@ int main(int argc, char **argv)
 
     // Load the video file
     VideoCapture cap; // Declare capture stream
-//    cap.open(rtsp_url);
-    cap.open(0, CAP_AVFOUNDATION);
+    cap.open(rtsp_url);
+//    cap.open(0, CAP_AVFOUNDATION);
 
     // Check if the video file was opened successfully!
     if (!cap.isOpened())
