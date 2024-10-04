@@ -6,6 +6,6 @@ set(OPENCV_FFMPEG_USE_FIND_PACKAGE=ON)
 
 find_package( OpenCV REQUIRED )
 
-add_executable(cctv_video_processing_cpp main.cpp)
+add_executable(cctv_video_processing_cpp src/main.cpp)
 target_include_directories(cctv_video_processing_cpp PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(cctv_video_processing_cpp ${OpenCV_LIBS})

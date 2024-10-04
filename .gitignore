@@ -95,6 +95,7 @@ proguard/
 
 # Log Files
 *.log
+log/
 
 # Android Studio Navigation editor temp files
 .navigation/
@@ -703,7 +704,7 @@ _TeamCity*
 # Coverlet is a free, cross platform Code Coverage Tool
 coverage*[.json, .xml, .info]
 
-# Visual Studio code coverage results
+# Visual Studio src coverage results
 *.coverage
 *.coveragexml
 

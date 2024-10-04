@@ -123,8 +123,8 @@ int main(int argc, char **argv)
 //    hog.setSVMDetector(HOGDescriptor::getDefaultPeopleDetector());
 
     CV_TRACE_FUNCTION();
-    String modelTxt = "<path>/MobileNetSSD_deploy.prototxt";
-    String modelBin = "<path>/MobileNetSSD_deploy.caffemodel";
+    String modelTxt = "/Users/bytedance/Documents/belajarcpp/cctv_video_processing_cpp/src/res/MobileNetSSD_deploy.prototxt";
+    String modelBin = "/Users/bytedance/Documents/belajarcpp/cctv_video_processing_cpp/src/res/MobileNetSSD_deploy.caffemodel";
     Net net = dnn::readNetFromCaffe(modelTxt, modelBin);
     if (net.empty())
     {
